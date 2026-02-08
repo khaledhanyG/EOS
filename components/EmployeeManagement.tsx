@@ -131,7 +131,12 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
     const formData = new FormData(e.currentTarget);
     const terminationDate = formData.get('terminationDate') as string;
     const terminationReason = formData.get('terminationReason') as TerminationReason;
-    updateEmployee(editingEmployee.id, { status: EmployeeStatus.TERMINATED, terminationDate, terminationReason });
+    updateEmployee(editingEmployee.id, {
+      status: EmployeeStatus.TERMINATED,
+      terminationDate,
+      terminationReason,
+      contractEndDate: terminationDate // Sync contract end date with termination date
+    });
     setIsTerminateModalOpen(false);
   };
 
@@ -596,7 +601,7 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
               </div>
               <div>
                 <label className="block text-xs font-black text-gray-400 uppercase mb-1">{t.payoutDate}</label>
-                <input type="date" name="payoutDate" required defaultValue={new Date().toISOString().split('T')[0]} className="w-full px-4 py-2 border rounded-xl font-bold" />
+                <input type="date" name="payoutDate" required defaultValue={editingEmployee.payoutDate || new Date().toISOString().split('T')[0]} className="w-full px-4 py-2 border rounded-xl font-bold" />
               </div>
               <div className="flex justify-end gap-3 pt-6 border-t">
                 <button type="button" onClick={() => setIsPayoutModalOpen(false)} className="px-6 py-2 font-bold text-gray-500">{t.cancel}</button>
@@ -666,9 +671,21 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
                     </div>
                     <div className="absolute -right-6 -bottom-6 text-indigo-500/20 text-9xl font-black group-hover:text-indigo-500/30 transition">SAR</div>
                   </div>
-                  <div className="bg-white border rounded-2xl p-6 shadow-sm hover:shadow-md transition">
+                  <div className="bg-white border rounded-2xl p-6 shadow-sm hover:shadow-md transition relative group">
                     <p className="text-gray-400 font-bold uppercase text-xs mb-1">{t.payoutAmount}</p>
                     <p className="text-3xl font-black text-gray-800">{(editingEmployee.payoutAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-sm text-gray-400">SAR</span></p>
+                    {editingEmployee.payoutDate && (
+                      <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase">📅 {editingEmployee.payoutDate}</p>
+                    )}
+                    {canEdit && (
+                      <button
+                        onClick={() => { setIsPayoutModalOpen(true); setIsPreviewModalOpen(false); }}
+                        className="absolute top-4 right-4 p-2 opacity-0 group-hover:opacity-100 transition-all bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+                        title={t.edit}
+                      >
+                        ✏️
+                      </button>
+                    )}
                   </div>
                   <div className="bg-green-50 border border-green-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
                     <p className="text-green-600 font-bold uppercase text-xs mb-1">{t.netPayable}</p>
