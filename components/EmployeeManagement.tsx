@@ -245,10 +245,10 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
                       <div className="text-[10px] text-gray-400 font-bold uppercase">{emp.jobTitle}</div>
                     </td>
                     <td className="px-6 py-5 text-gray-600 font-bold tabular-nums">
-                      {((emp.basicSalary || 0) + (emp.housingAllowance || 0) + (emp.transportAllowance || 0) + (emp.otherAllowances || 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      {((emp.basicSalary || 0) + (emp.housingAllowance || 0) + (emp.transportAllowance || 0) + (emp.otherAllowances || 0)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td className="px-6 py-5 font-black text-green-600 tabular-nums">
-                      {calc.remainingLiability.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      {calc.remainingLiability.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td className="px-6 py-5">
                       <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase ${emp.status === EmployeeStatus.ACTIVE ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
@@ -431,7 +431,7 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 w-full">
                               <div className="font-black text-lg text-gray-800 whitespace-nowrap">
                                 <span className="text-xs text-gray-400 font-medium mr-1">SAR</span>
-                                {hist.total.toLocaleString('en-US')}
+                                {hist.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </div>
                               <div className="text-[10px] bg-white border px-2 py-1 rounded-full text-gray-500 font-bold truncate max-w-[150px]">
                                 {hist.reason || '-'}
@@ -662,17 +662,17 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
                   <div className="bg-indigo-600 rounded-2xl p-6 text-white shadow-lg shadow-indigo-200 relative overflow-hidden group hover:scale-[1.02] transition">
                     <div className="relative z-10">
                       <p className="text-indigo-200 font-bold uppercase text-xs mb-1">{t.totalAccrued}</p>
-                      <p className="text-3xl font-black">{calc.accruedBenefit.toLocaleString('en-US', { minimumFractionDigits: 2 })} <span className="text-sm opacity-50">SAR</span></p>
+                      <p className="text-3xl font-black">{calc.accruedBenefit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-sm opacity-50">SAR</span></p>
                     </div>
                     <div className="absolute -right-6 -bottom-6 text-indigo-500/20 text-9xl font-black group-hover:text-indigo-500/30 transition">SAR</div>
                   </div>
                   <div className="bg-white border rounded-2xl p-6 shadow-sm hover:shadow-md transition">
                     <p className="text-gray-400 font-bold uppercase text-xs mb-1">{t.payoutAmount}</p>
-                    <p className="text-3xl font-black text-gray-800">{(editingEmployee.payoutAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} <span className="text-sm text-gray-400">SAR</span></p>
+                    <p className="text-3xl font-black text-gray-800">{(editingEmployee.payoutAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-sm text-gray-400">SAR</span></p>
                   </div>
                   <div className="bg-green-50 border border-green-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
                     <p className="text-green-600 font-bold uppercase text-xs mb-1">{t.netPayable}</p>
-                    <p className="text-3xl font-black text-green-700">{calc.remainingLiability.toLocaleString('en-US', { minimumFractionDigits: 2 })} <span className="text-sm opacity-50">SAR</span></p>
+                    <p className="text-3xl font-black text-green-700">{calc.remainingLiability.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-sm opacity-50">SAR</span></p>
                   </div>
                 </div>
 
@@ -702,12 +702,12 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
                         <span className="text-lg">💰</span> {t.salaryBasis}
                       </h3>
                       <div className="space-y-3">
-                        <div className="flex justify-between items-center"><span className="text-gray-500 font-bold text-xs uppercase">{t.basicSalary}</span><span className="font-bold text-gray-800">{displaySalary.basic?.toLocaleString('en-US')} SAR</span></div>
-                        <div className="flex justify-between items-center"><span className="text-gray-500 font-bold text-xs uppercase">{t.housing}</span><span className="font-bold text-gray-800">{displaySalary.housing?.toLocaleString('en-US')} SAR</span></div>
-                        <div className="flex justify-between items-center"><span className="text-gray-500 font-bold text-xs uppercase">{t.transport}</span><span className="font-bold text-gray-800">{displaySalary.transport?.toLocaleString('en-US')} SAR</span></div>
-                        <div className="flex justify-between items-center"><span className="text-gray-500 font-bold text-xs uppercase">{t.other}</span><span className="font-bold text-gray-800">{displaySalary.other?.toLocaleString('en-US')} SAR</span></div>
+                        <div className="flex justify-between items-center"><span className="text-gray-500 font-bold text-xs uppercase">{t.basicSalary}</span><span className="font-bold text-gray-800">{displaySalary.basic?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SAR</span></div>
+                        <div className="flex justify-between items-center"><span className="text-gray-500 font-bold text-xs uppercase">{t.housing}</span><span className="font-bold text-gray-800">{displaySalary.housing?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SAR</span></div>
+                        <div className="flex justify-between items-center"><span className="text-gray-500 font-bold text-xs uppercase">{t.transport}</span><span className="font-bold text-gray-800">{displaySalary.transport?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SAR</span></div>
+                        <div className="flex justify-between items-center"><span className="text-gray-500 font-bold text-xs uppercase">{t.other}</span><span className="font-bold text-gray-800">{displaySalary.other?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SAR</span></div>
                         <div className="h-px bg-gray-100 my-2"></div>
-                        <div className="flex justify-between items-center text-lg"><span className="font-black text-gray-800">{t.totalSalary}</span><span className="font-black text-green-600">{displaySalary.total?.toLocaleString('en-US')} SAR</span></div>
+                        <div className="flex justify-between items-center text-lg"><span className="font-black text-gray-800">{t.totalSalary}</span><span className="font-black text-green-600">{displaySalary.total?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SAR</span></div>
                       </div>
                     </div>
 
@@ -741,14 +741,14 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
                             </div>
                             <div className="flex-1 w-full">
                               <div className="flex justify-between items-start mb-1 gap-2">
-                                <span className="font-black text-gray-800">{hist.total.toLocaleString('en-US')} SAR</span>
+                                <span className="font-black text-gray-800">{hist.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SAR</span>
                                 <span className="text-[9px] font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full uppercase tracking-wider whitespace-nowrap">{hist.reason || t.adjustment}</span>
                               </div>
                               <div className="text-[10px] text-gray-500 grid grid-cols-2 gap-1 mt-1">
-                                <span>B: {hist.basicSalary?.toLocaleString('en-US')}</span>
-                                <span>H: {hist.housingAllowance?.toLocaleString('en-US')}</span>
-                                <span>T: {hist.transportAllowance?.toLocaleString('en-US')}</span>
-                                <span>O: {hist.otherAllowances?.toLocaleString('en-US')}</span>
+                                <span>B: {hist.basicSalary?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <span>H: {hist.housingAllowance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <span>T: {hist.transportAllowance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                <span>O: {hist.otherAllowances?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                               </div>
                             </div>
                           </div>

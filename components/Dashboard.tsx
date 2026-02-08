@@ -49,7 +49,8 @@ const Dashboard: React.FC<DashboardProps> = ({ employees, t, isRtl }) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'SAR',
-      maximumFractionDigits: 0
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     }).format(val);
   };
 

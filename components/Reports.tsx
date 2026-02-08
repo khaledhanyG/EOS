@@ -50,7 +50,7 @@ const Reports: React.FC<ReportsProps> = ({ employees, t, isRtl, language }) => {
     const esbStart = calculateESB(emp, prevMonthEnd);
 
     const totalAccrual = esbEnd.totalLiability - esbStart.totalLiability;
-    
+
     // Check if salary changed this month to separate "Standard Accrual" from "Adjustment Accrual"
     const salaryStart = getSalaryAtDate(emp, prevMonthEnd);
     const salaryEnd = getSalaryAtDate(emp, endDate);
@@ -113,13 +113,13 @@ const Reports: React.FC<ReportsProps> = ({ employees, t, isRtl, language }) => {
       {/* Controls */}
       <div className="bg-white p-6 rounded-xl shadow-sm border no-print flex flex-col md:flex-row gap-6 items-center">
         <div className="flex bg-gray-100 p-1 rounded-lg w-full md:w-auto">
-          <button 
+          <button
             onClick={() => setReportType('cumulative')}
             className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${reportType === 'cumulative' ? 'bg-white shadow text-green-700' : 'text-gray-500'}`}
           >
             {t.financialOverview}
           </button>
-          <button 
+          <button
             onClick={() => setReportType('monthly')}
             className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${reportType === 'monthly' ? 'bg-white shadow text-green-700' : 'text-gray-500'}`}
           >
@@ -129,15 +129,15 @@ const Reports: React.FC<ReportsProps> = ({ employees, t, isRtl, language }) => {
 
         {reportType === 'monthly' && (
           <div className="flex gap-4 w-full md:w-auto">
-            <select 
-              value={selectedYear} 
+            <select
+              value={selectedYear}
               onChange={(e) => setSelectedYear(Number(e.target.value))}
               className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-bold"
             >
               {years.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
-            <select 
-              value={selectedMonth} 
+            <select
+              value={selectedMonth}
               onChange={(e) => setSelectedMonth(Number(e.target.value))}
               className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none font-bold"
             >
@@ -165,10 +165,10 @@ const Reports: React.FC<ReportsProps> = ({ employees, t, isRtl, language }) => {
           </div>
           <div className="text-right rtl:text-left">
             <div className="text-sm font-bold text-gray-500">{new Date().toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}</div>
-            <div className="text-[10px] text-gray-400 font-mono">ID: ESB-RPT-{selectedYear}{selectedMonth+1}</div>
+            <div className="text-[10px] text-gray-400 font-mono">ID: ESB-RPT-{selectedYear}{selectedMonth + 1}</div>
           </div>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left rtl:text-right border-collapse">
             <thead className="bg-gray-50 text-gray-500 font-bold uppercase tracking-wider text-[11px] border-b">
@@ -203,10 +203,10 @@ const Reports: React.FC<ReportsProps> = ({ employees, t, isRtl, language }) => {
                       </td>
                       <td className="px-6 py-4 text-gray-600 font-mono">{emp.hireDate}</td>
                       <td className="px-6 py-4 text-gray-600 font-bold">{calc.breakdown.years}Y {calc.breakdown.months}M</td>
-                      <td className="px-6 py-4 text-right tabular-nums">{emp.openingBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                      <td className="px-6 py-4 text-right tabular-nums">{calc.accruedBenefit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                      <td className="px-6 py-4 text-right tabular-nums">{emp.openingBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      <td className="px-6 py-4 text-right tabular-nums">{calc.accruedBenefit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       <td className="px-6 py-4 text-right tabular-nums font-black text-green-600 text-base">
-                        {calc.totalLiability.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        {calc.totalLiability.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                     </tr>
                   );
@@ -218,11 +218,11 @@ const Reports: React.FC<ReportsProps> = ({ employees, t, isRtl, language }) => {
                         <div className="font-bold text-gray-800">{emp.name}</div>
                         {prov.hasSalaryChange && <div className="text-[10px] text-amber-600 font-bold">⚠️ {t.salaryAdjustment}</div>}
                       </td>
-                      <td className="px-6 py-4 text-right tabular-nums text-gray-600 font-bold">{prov.standardAccrual.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                      <td className="px-6 py-4 text-right tabular-nums text-amber-600 font-bold">{prov.adjustmentAccrual.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                      <td className="px-6 py-4 text-right tabular-nums font-black text-indigo-600">{prov.totalAccrual.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                      <td className="px-6 py-4 text-right tabular-nums text-gray-600 font-bold">{prov.standardAccrual.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      <td className="px-6 py-4 text-right tabular-nums text-amber-600 font-bold">{prov.adjustmentAccrual.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                      <td className="px-6 py-4 text-right tabular-nums font-black text-indigo-600">{prov.totalAccrual.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       <td className="px-6 py-4 text-right tabular-nums font-black text-gray-800 text-base">
-                        {prov.closingBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        {prov.closingBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
                     </tr>
                   );
@@ -233,20 +233,20 @@ const Reports: React.FC<ReportsProps> = ({ employees, t, isRtl, language }) => {
               {reportType === 'cumulative' ? (
                 <tr>
                   <td className="px-6 py-6 font-black text-gray-400" colSpan={3}>GRAND TOTAL</td>
-                  <td className="px-6 py-6 text-right tabular-nums font-black">{employees.reduce((sum, e) => sum + e.openingBalance, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                  <td className="px-6 py-6 text-right tabular-nums font-black">{employees.reduce((sum, e) => sum + calculateESB(e).accruedBenefit, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                  <td className="px-6 py-6 text-right tabular-nums font-black">{employees.reduce((sum, e) => sum + e.openingBalance, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td className="px-6 py-6 text-right tabular-nums font-black">{employees.reduce((sum, e) => sum + calculateESB(e).accruedBenefit, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td className="px-6 py-6 text-right tabular-nums text-xl font-black text-green-800">
-                    {employees.reduce((sum, e) => sum + calculateESB(e).totalLiability, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    {employees.reduce((sum, e) => sum + calculateESB(e).totalLiability, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </td>
                 </tr>
               ) : (
                 <tr>
                   <td className="px-6 py-6 font-black text-gray-400">TOTAL PROVISION</td>
-                  <td className="px-6 py-6 text-right tabular-nums font-black">{employees.reduce((sum, e) => sum + getProvisioningForMonth(e, selectedYear, selectedMonth).standardAccrual, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                  <td className="px-6 py-6 text-right tabular-nums font-black">{employees.reduce((sum, e) => sum + getProvisioningForMonth(e, selectedYear, selectedMonth).adjustmentAccrual, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                  <td className="px-6 py-6 text-right tabular-nums font-black text-indigo-700 text-lg">{employees.reduce((sum, e) => sum + getProvisioningForMonth(e, selectedYear, selectedMonth).totalAccrual, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                  <td className="px-6 py-6 text-right tabular-nums font-black">{employees.reduce((sum, e) => sum + getProvisioningForMonth(e, selectedYear, selectedMonth).standardAccrual, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td className="px-6 py-6 text-right tabular-nums font-black">{employees.reduce((sum, e) => sum + getProvisioningForMonth(e, selectedYear, selectedMonth).adjustmentAccrual, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td className="px-6 py-6 text-right tabular-nums font-black text-indigo-700 text-lg">{employees.reduce((sum, e) => sum + getProvisioningForMonth(e, selectedYear, selectedMonth).totalAccrual, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                   <td className="px-6 py-6 text-right tabular-nums font-black text-gray-800 text-xl">
-                    {employees.reduce((sum, e) => sum + getProvisioningForMonth(e, selectedYear, selectedMonth).closingBalance, 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    {employees.reduce((sum, e) => sum + getProvisioningForMonth(e, selectedYear, selectedMonth).closingBalance, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </td>
                 </tr>
               )}
@@ -254,13 +254,13 @@ const Reports: React.FC<ReportsProps> = ({ employees, t, isRtl, language }) => {
           </table>
         </div>
       </div>
-      
+
       {/* Legend / Info */}
       {reportType === 'monthly' && (
         <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-xl flex items-start gap-3 no-print">
           <span className="text-xl">💡</span>
           <div className="text-xs text-indigo-800 leading-relaxed">
-            <strong>{t.salaryAdjustment}:</strong> {isRtl 
+            <strong>{t.salaryAdjustment}:</strong> {isRtl
               ? 'توضح هذه القيمة فرق الاستحقاق التراكمي لجميع السنوات السابقة عند تعديل راتب الموظف في هذا الشهر. يتم تحميل كامل الفرق على شهر التعديل لضمان دقة الرصيد الختامي.'
               : 'This value represents the cumulative accrual difference for all previous years when a salary adjustment occurs this month. The entire difference is loaded into the adjustment month to ensure closing balance accuracy.'}
           </div>
