@@ -52,14 +52,53 @@ export const calculateServiceBreakdown = (hireDate: string, endDate: Date = new 
   let d2_adj = d2;
   if (d2 === 31 || isLastDayOfMonth(end)) d2_adj = 30;
 
-  // The "+ 1" makes the calculation inclusive of both start and end days
-  const totalDays = ((y2 - y1) * 360) + ((m2 - m1) * 30) + (d2_adj - d1_adj) + 1;
+  // 1. Calculate raw difference using Y/M/D subtraction with borrowing
+  let years = y2 - y1;
+  let months = m2 - m1;
+  let days = d2 - d1;
 
-  if (totalDays <= 0) return { years: 0, months: 0, days: 0 };
+  if (days < 0) {
+    days += 30;
+    months -= 1;
+  }
+  if (months < 0) {
+    months += 12;
+    years -= 1;
+  }
 
-  const years = Math.floor(totalDays / 360);
-  const months = Math.floor((totalDays % 360) / 30);
-  const days = (totalDays % 30) + 1; // User requested +1 to the calculated days
+  // If the end date is before the start date, return 0 service
+  if (years < 0 || (years === 0 && months < 0) || (years === 0 && months === 0 && days <= 0)) {
+    return { years: 0, months: 0, days: 0 };
+  }
+
+  // 2. Perform initial rollover for edge cases (e.g., d2-d1 = 30)
+  if (days >= 30) {
+    days = 0;
+    months += 1;
+  }
+  if (months >= 12) {
+    months = 0;
+    years += 1;
+  }
+
+  // 3. Conditional +1 Logic
+  // If it's a perfect whole year (inclusive), don't add +1.
+  // Otherwise, add +1 to include the last day.
+  const isPerfectWholeYear = years > 0 && months === 0 && days === 0;
+
+  if (!isPerfectWholeYear) {
+    days += 1;
+
+    // Rollover again after adding +1
+    if (days >= 30) {
+      days = 0;
+      months += 1;
+    }
+    if (months >= 12) {
+      months = 0;
+      years += 1;
+    }
+  }
 
   return { years, months, days };
 };
