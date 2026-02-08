@@ -32,7 +32,6 @@ export const calculateServiceBreakdown = (hireDate: string, endDate: Date = new 
   const start = new Date(hireDate);
   const end = new Date(endDate);
 
-  // Using 360-day year (Saudi Labor Law standard for calculations)
   const y1 = start.getFullYear();
   const m1 = start.getMonth();
   const d1 = start.getDate();
@@ -40,7 +39,22 @@ export const calculateServiceBreakdown = (hireDate: string, endDate: Date = new 
   const m2 = end.getMonth();
   const d2 = end.getDate();
 
-  const totalDays = ((y2 - y1) * 360) + ((m2 - m1) * 30) + (d2 - d1) + 1;
+  const isLastDayOfMonth = (date: Date) => {
+    const d = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    return date.getDate() === d.getDate();
+  };
+
+  // 30/360 Rule adjustment
+  // Treat 31st and last day of Feb as 30th
+  let d1_adj = d1;
+  if (d1 === 31 || isLastDayOfMonth(start)) d1_adj = 30;
+
+  let d2_adj = d2;
+  if (d2 === 31 || isLastDayOfMonth(end)) d2_adj = 30;
+
+  // The "+ 1" makes the calculation inclusive of both start and end days
+  const totalDays = ((y2 - y1) * 360) + ((m2 - m1) * 30) + (d2_adj - d1_adj) + 1;
+
   if (totalDays <= 0) return { years: 0, months: 0, days: 0 };
 
   const years = Math.floor(totalDays / 360);
