@@ -113,7 +113,8 @@ const Dashboard: React.FC<DashboardProps> = ({ employees, t, isRtl }) => {
           annualTotal,
           liabilityAtYearEnd
         };
-      });
+      })
+      .filter(row => row.annualTotal !== 0 || row.liabilityAtYearEnd !== 0);
   }, [employees, selectedYear, months]);
 
   return (
