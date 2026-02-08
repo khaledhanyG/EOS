@@ -59,7 +59,7 @@ export const calculateServiceBreakdown = (hireDate: string, endDate: Date = new 
 
   const years = Math.floor(totalDays / 360);
   const months = Math.floor((totalDays % 360) / 30);
-  const days = totalDays % 30;
+  const days = (totalDays % 30) + 1; // User requested +1 to the calculated days
 
   return { years, months, days };
 };
