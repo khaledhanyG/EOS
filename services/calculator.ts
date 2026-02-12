@@ -44,14 +44,6 @@ export const calculateServiceBreakdown = (hireDate: string, endDate: Date = new 
     return date.getDate() === d.getDate();
   };
 
-  // 30/360 Rule adjustment
-  // Treat 31st and last day of Feb as 30th
-  let d1_adj = d1;
-  if (d1 === 31 || isLastDayOfMonth(start)) d1_adj = 30;
-
-  let d2_adj = d2;
-  if (d2 === 31 || isLastDayOfMonth(end)) d2_adj = 30;
-
   // 1. Calculate raw difference using Y/M/D subtraction with borrowing
   let years = y2 - y1;
   let months = m2 - m1;
@@ -64,11 +56,6 @@ export const calculateServiceBreakdown = (hireDate: string, endDate: Date = new 
   if (months < 0) {
     months += 12;
     years -= 1;
-  }
-
-  // If the end date is before the start date, return 0 service
-  if (years < 0 || (years === 0 && months < 0) || (years === 0 && months === 0 && days <= 0)) {
-    return { years: 0, months: 0, days: 0 };
   }
 
   // If the end date is before the start date, return 0 service
@@ -98,20 +85,31 @@ export const calculateServiceBreakdown = (hireDate: string, endDate: Date = new 
         years += 1;
       }
     } else {
-      // 4. Normal case (end is NOT month-end): Rollover days >= 30, then add +1
-      if (days >= 30) {
-        days = 0;
-        months += 1;
-      }
-      if (months >= 12) {
-        months = 0;
-        years += 1;
+      // 4. Normal case (end is NOT month-end): Calculate actual calendar days
+      // Get the date at the same day in the end month
+      const baseDate = new Date(y2, m2, d1);
+      
+      // If baseDate is after end (e.g., start is 31st but end month has 30 days)
+      // then we need to adjust
+      if (baseDate > end) {
+        // Go back one month
+        months -= 1;
+        if (months < 0) {
+          months = 11;
+          years -= 1;
+        }
+        
+        // Calculate actual days from start day in the previous month to end date
+        const prevMonthBase = new Date(y2, m2 - 1, d1);
+        const diffMs = end.getTime() - prevMonthBase.getTime();
+        days = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1; // +1 to include end day
+      } else {
+        // Calculate actual days from baseDate to end
+        const diffMs = end.getTime() - baseDate.getTime();
+        days = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1; // +1 to include end day
       }
 
-      // Add +1 to include the last day
-      days += 1;
-
-      // Rollover again after adding +1
+      // Rollover if needed
       if (days >= 30) {
         days = 0;
         months += 1;
