@@ -21,6 +21,7 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, t, isRtl, la
     { id: 'employees', icon: '👥', label: t.employees, visible: user?.permissions.viewEmployees },
     { id: 'archive', icon: '🗄️', label: t.archive, visible: user?.permissions.viewEmployees },
     { id: 'reports', icon: '📝', label: t.reports, visible: user?.permissions.viewReports },
+    { id: 'services', icon: '🧰', label: t.services, visible: true },
     { id: 'settings', icon: '⚙️', label: t.settings, visible: user?.role === 'ADMIN' },
   ].filter(item => item.visible);
 

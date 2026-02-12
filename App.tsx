@@ -9,12 +9,13 @@ import Sidebar from './components/Sidebar';
 import Login from './components/Login';
 import OrgSelection from './components/OrgSelection';
 import AdminSettings from './components/AdminSettings';
+import Services from './components/Services';
 import { initDatabase, fetchEmployees, dbAddEmployee, dbUpdateEmployee, dbDeleteEmployee } from './services/db';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'employees' | 'archive' | 'reports' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'employees' | 'archive' | 'reports' | 'services' | 'settings'>('dashboard');
   const [language, setLanguage] = useState<Language>('ar');
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -214,6 +215,9 @@ const App: React.FC = () => {
           )}
           {activeTab === 'reports' && user?.permissions.viewReports && (
             <Reports employees={employees} t={t} isRtl={isRtl} language={language} />
+          )}
+          {activeTab === 'services' && (
+            <Services t={t} isRtl={isRtl} />
           )}
           {activeTab === 'settings' && user?.role === 'ADMIN' && (
             <AdminSettings currentUser={user} t={t} isRtl={isRtl} />
