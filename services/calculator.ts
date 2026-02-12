@@ -102,19 +102,14 @@ export const calculateServiceBreakdown = (hireDate: string, endDate: Date = new 
 
   // 4. Month-end rule for remaining days based on start day
   if (isLastDayOfMonth(end)) {
-    if (d1 <= 2) {
-      if (days > 0) {
-        days = 0;
-        months += 1;
-      }
-    } else {
-      days += 1;
-    }
-
-    if (days >= 30) {
+    const remainingDays = 32 - d1;
+    if (remainingDays >= 30) {
       days = 0;
       months += 1;
+    } else {
+      days = remainingDays;
     }
+
     if (months >= 12) {
       months = 0;
       years += 1;
