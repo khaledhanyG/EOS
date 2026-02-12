@@ -121,19 +121,6 @@ const Dashboard: React.FC<DashboardProps> = ({ employees, t, isRtl }) => {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center no-print">
-        <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-          <span>📅</span> {t.viewByYear}
-        </h2>
-        <select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(Number(e.target.value))}
-          className="px-6 py-2 bg-white border-2 border-green-100 rounded-xl font-bold text-green-700 shadow-sm focus:ring-2 focus:ring-green-500 outline-none"
-        >
-          {years.map(y => <option key={y} value={y}>{y}</option>)}
-        </select>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard title={t.remainingAmount} value={stats.totalLiability} icon="💰" color="bg-blue-600" />
         <StatCard title={t.totalAccrued} value={stats.totalAccrued} icon="📈" color="bg-green-600" />
@@ -142,21 +129,26 @@ const Dashboard: React.FC<DashboardProps> = ({ employees, t, isRtl }) => {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-        <div className="p-6 border-b bg-gray-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <h2 className="text-lg font-bold text-gray-700">{t.monthlyAccrualMatrix} ({selectedYear})</h2>
-          <div className="flex items-center gap-4 w-full md:w-auto">
-            <div className="relative flex-1 md:flex-none md:w-64">
-              <input
-                type="text"
-                placeholder={t.searchPlaceholder}
-                value={employeeSearchTerm}
-                onChange={(e) => setEmployeeSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 pr-10 bg-white border border-gray-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-green-500 outline-none"
-              />
-              <span className={`absolute ${isRtl ? 'left-3' : 'right-3'} top-2.5 text-gray-400`}>🔍</span>
-            </div>
-            <span className="text-xs font-bold text-gray-400 whitespace-nowrap">SAR / MONTH</span>
+        <div className="p-6 border-b bg-gray-50 flex items-center gap-4">
+          <div className="relative w-64">
+            <input
+              type="text"
+              placeholder={t.searchPlaceholder}
+              value={employeeSearchTerm}
+              onChange={(e) => setEmployeeSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 pr-10 bg-white border border-gray-200 rounded-xl font-bold text-sm focus:ring-2 focus:ring-green-500 outline-none"
+            />
+            <span className={`absolute ${isRtl ? 'left-3' : 'right-3'} top-2.5 text-gray-400`}>🔍</span>
           </div>
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className="px-6 py-2 bg-white border-2 border-green-100 rounded-xl font-bold text-green-700 shadow-sm focus:ring-2 focus:ring-green-500 outline-none"
+          >
+            {years.map(y => <option key={y} value={y}>{y}</option>)}
+          </select>
+          <h2 className="flex-1 text-center text-lg font-bold text-gray-700">{t.monthlyAccrualMatrix} - {selectedYear}</h2>
+          <span className="text-xs font-bold text-gray-400 whitespace-nowrap">SAR / MONTH</span>
         </div>
         <div className="overflow-x-auto matrix-scroll">
           <table className="w-full text-xs text-left rtl:text-right border-collapse">
