@@ -71,38 +71,44 @@ export const calculateServiceBreakdown = (hireDate: string, endDate: Date = new 
     return { years: 0, months: 0, days: 0 };
   }
 
-  // 2. Perform initial rollover for edge cases (e.g., d2-d1 = 30)
-  if (days >= 30) {
-    days = 0;
-    months += 1;
-  }
-  if (months >= 12) {
-    months = 0;
-    years += 1;
+  // If the end date is before the start date, return 0 service
+  if (years < 0 || (years === 0 && months < 0) || (years === 0 && months === 0 && days <= 0)) {
+    return { years: 0, months: 0, days: 0 };
   }
 
-  // 3. Check if it's a perfect whole year (inclusive)
-  // If it's a perfect whole year, don't apply any additional logic
+  // 2. Check if it's a perfect whole year (no additional adjustments needed)
   const isPerfectWholeYear = years > 0 && months === 0 && days === 0;
 
   if (!isPerfectWholeYear) {
-    // 4. Month-end rule for remaining days based on start day
     const isEndMonthEnd = isLastDayOfMonth(end);
+
     if (isEndMonthEnd) {
-      const remainingDays = 32 - d1;
-      if (remainingDays >= 30) {
+      // 3. Month-end rule: Replace days with 32 - startDay formula
+      days = 32 - d1;
+
+      // Convert remaining days >= 30 to a month
+      if (days >= 30) {
         days = 0;
         months += 1;
-      } else {
-        days = remainingDays;
       }
 
+      // Rollover months to years if needed
       if (months >= 12) {
         months = 0;
         years += 1;
       }
     } else {
-      // 5. Conditional +1 Logic (only if NOT month-end)
+      // 4. Normal case (end is NOT month-end): Rollover days >= 30, then add +1
+      if (days >= 30) {
+        days = 0;
+        months += 1;
+      }
+      if (months >= 12) {
+        months = 0;
+        years += 1;
+      }
+
+      // Add +1 to include the last day
       days += 1;
 
       // Rollover again after adding +1
