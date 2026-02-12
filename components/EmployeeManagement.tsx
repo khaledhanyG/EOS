@@ -48,15 +48,20 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
       setNewSalaryValue(total);
       setSalaryChangeReason(t.annualReview);
       setSalaryChangeDate(new Date().toISOString().split('T')[0]);
+    } else {
+      setSalaryForm({ gross: 0, basic: 0, housing: 0, transport: 0, other: 0 });
+    }
+  }, [editingEmployee, isModalOpen, isSalaryModalOpen, t]);
 
+  // Separate effect: Only reset preview date when modal OPENS (not on employee change)
+  useEffect(() => {
+    if (isPreviewModalOpen && editingEmployee) {
       const defaultDate = editingEmployee.status === EmployeeStatus.TERMINATED && editingEmployee.terminationDate
         ? editingEmployee.terminationDate
         : new Date().toISOString().split('T')[0];
       setPreviewCalcDate(defaultDate);
-    } else {
-      setSalaryForm({ gross: 0, basic: 0, housing: 0, transport: 0, other: 0 });
     }
-  }, [editingEmployee, isModalOpen, isSalaryModalOpen, isPreviewModalOpen, t]);
+  }, [isPreviewModalOpen]);
 
   const handleGrossChange = (val: number) => {
     const basic = Number((val / 1.35).toFixed(2));
