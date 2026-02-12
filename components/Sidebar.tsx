@@ -26,79 +26,87 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, t, isRtl, la
   ].filter(item => item.visible);
 
   return (
-    <aside className="w-64 bg-white shadow-xl flex flex-col h-screen sticky top-0 z-40 no-print">
-      <div className="p-6 border-b">
+    <header className="w-full bg-white shadow-md flex items-center justify-between px-6 py-3 sticky top-0 z-50 no-print">
+      {/* Logo and Title */}
+      <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center text-white text-xl font-bold shadow-lg shadow-green-100">
             S
           </div>
-          <span className="text-xl font-black text-gray-800 tracking-tight">{t.title}</span>
+          <span className="text-lg font-black text-gray-800 tracking-tight hidden md:block">{t.title}</span>
         </div>
+        
+        {selectedOrg && (
+          <div className="bg-green-50 px-4 py-2 rounded-xl border border-green-100 flex items-center gap-2">
+            <span className="text-sm">🏢</span>
+            <div>
+              <p className="text-xs font-black text-green-800">{selectedOrg.name}</p>
+            </div>
+          </div>
+        )}
       </div>
 
-      {selectedOrg && (
-        <div className="p-4 mt-2">
-          <div className="bg-green-50 p-3 rounded-2xl border border-green-100 flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🏢</span>
-              <div className="overflow-hidden">
-                <p className="text-xs font-black text-green-800 truncate">{selectedOrg.name}</p>
-                <p className="text-[8px] font-bold text-green-600 uppercase tracking-widest">{t.active}</p>
-              </div>
-            </div>
-            <button
-              onClick={onSwitchOrg}
-              className="w-full py-1.5 bg-white border border-green-200 rounded-lg text-[9px] font-black text-green-700 hover:bg-green-100 transition-all uppercase tracking-tighter"
-            >
-              🔄 {t.switchOrg}
-            </button>
-          </div>
-        </div>
-      )}
-
-      <nav className="flex-1 py-4 space-y-1">
+      {/* Navigation Menu */}
+      <nav className="flex items-center gap-2">
         {menuItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center px-6 py-4 text-sm font-bold transition-all ${activeTab === item.id
-                ? 'bg-green-50 text-green-700 border-r-4 border-green-600 rtl:border-r-0 rtl:border-l-4'
-                : 'text-gray-500 hover:bg-gray-50'
-              }`}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl transition-all ${
+              activeTab === item.id
+                ? 'bg-green-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-100'
+            }`}
           >
-            <span className="text-xl mr-3 rtl:ml-3">{item.icon}</span>
-            {item.label}
+            <span className="text-lg">{item.icon}</span>
+            <span className="hidden lg:inline">{item.label}</span>
           </button>
         ))}
       </nav>
 
-      <div className="p-6 border-t space-y-6">
-        <div className="flex bg-gray-100 p-1 rounded-xl">
+      {/* Right Side: Language, Org Switch, Logout */}
+      <div className="flex items-center gap-3">
+        {/* Language Switcher */}
+        <div className="flex bg-gray-100 p-1 rounded-lg">
           <button
             onClick={() => setLanguage('en')}
-            className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-lg transition-all ${language === 'en' ? 'bg-white shadow-sm text-green-700' : 'text-gray-400'
-              }`}
+            className={`px-3 py-1 text-[10px] font-black uppercase rounded transition-all ${
+              language === 'en' ? 'bg-white shadow-sm text-green-700' : 'text-gray-400'
+            }`}
           >
             EN
           </button>
           <button
             onClick={() => setLanguage('ar')}
-            className={`flex-1 py-1.5 text-[10px] font-black uppercase rounded-lg transition-all ${language === 'ar' ? 'bg-white shadow-sm text-green-700' : 'text-gray-400'
-              }`}
+            className={`px-3 py-1 text-[10px] font-black uppercase rounded transition-all ${
+              language === 'ar' ? 'bg-white shadow-sm text-green-700' : 'text-gray-400'
+            }`}
           >
             AR
           </button>
         </div>
 
+        {/* Switch Org Button */}
+        {selectedOrg && (
+          <button
+            onClick={onSwitchOrg}
+            className="hidden md:flex items-center gap-1 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-xs font-bold text-green-700 hover:bg-green-100 transition-all"
+            title={t.switchOrg}
+          >
+            🔄
+          </button>
+        )}
+
+        {/* Logout */}
         <button
           onClick={onLogout}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-black text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition-all"
+          className="flex items-center gap-1 px-3 py-2 text-xs font-black text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-all"
+          title={t.logout}
         >
           <span>🚪</span>
-          {t.logout}
         </button>
       </div>
-    </aside>
+    </header>
   );
 };
 

@@ -154,7 +154,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`flex min-h-screen bg-gray-50 ${isRtl ? 'rtl text-right' : 'ltr text-left'}`} dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className={`flex flex-col min-h-screen bg-gray-50 ${isRtl ? 'rtl text-right' : 'ltr text-left'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
