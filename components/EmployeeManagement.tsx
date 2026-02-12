@@ -614,6 +614,12 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
 
       {/* Preview Modal */}
       {isPreviewModalOpen && editingEmployee && (() => {
+        const [employeeSearchTerm, setEmployeeSearchTerm] = React.useState('');
+        const filteredEmpsForDropdown = employees.filter(e =>
+          e.name.toLowerCase().includes(employeeSearchTerm.toLowerCase()) ||
+          (e.employeeNumber && e.employeeNumber.toLowerCase().includes(employeeSearchTerm.toLowerCase()))
+        );
+
         const calc = calculateESB(editingEmployee, new Date(previewCalcDate));
 
         // Help find relevant salary entry for breakdown/display
@@ -636,12 +642,42 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
             <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
               {/* Header */}
-              <div className="p-6 bg-gray-900 text-white flex justify-between items-center shrink-0">
-                <div>
+              <div className="p-6 bg-gray-900 text-white flex justify-between items-center gap-4 shrink-0 flex-wrap">
+                <div className="flex-1 min-w-[200px]">
+                  <label className="block text-xs font-black text-gray-400 uppercase mb-2">{t.employeeName}</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder={t.searchPlaceholder}
+                      value={employeeSearchTerm}
+                      onChange={(e) => setEmployeeSearchTerm(e.target.value)}
+                      className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white font-bold placeholder-gray-500 focus:border-indigo-500 outline-none"
+                    />
+                    {employeeSearchTerm && filteredEmpsForDropdown.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 max-h-48 overflow-y-auto">
+                        {filteredEmpsForDropdown.map(emp => (
+                          <button
+                            key={emp.id}
+                            type="button"
+                            onClick={() => {
+                              setEditingEmployee(emp);
+                              setEmployeeSearchTerm('');
+                            }}
+                            className="w-full px-4 py-2 text-left text-white hover:bg-gray-700 transition text-sm font-bold border-b border-gray-700 last:border-b-0"
+                          >
+                            <div className="font-black">{emp.name}</div>
+                            <div className="text-xs text-gray-400">{emp.employeeNumber} • {emp.jobTitle}</div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex-1 min-w-[150px] text-right">
                   <h2 className="text-2xl font-black tracking-tight">{editingEmployee.name}</h2>
                   <p className="text-gray-400 font-bold uppercase text-xs tracking-wider">{editingEmployee.jobTitle} • {editingEmployee.employeeNumber}</p>
                 </div>
-                <button onClick={() => setIsPreviewModalOpen(false)} className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition">✕</button>
+                <button onClick={() => setIsPreviewModalOpen(false)} className="bg-white/10 hover:bg-white/20 p-2 rounded-full transition shrink-0">✕</button>
               </div>
 
               {/* Scrollable Content */}
