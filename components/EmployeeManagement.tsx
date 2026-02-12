@@ -33,6 +33,7 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
   const [salaryChangeDate, setSalaryChangeDate] = useState(new Date().toISOString().split('T')[0]);
 
   const [previewCalcDate, setPreviewCalcDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [employeeSearchTerm, setEmployeeSearchTerm] = useState<string>('');
 
   useEffect(() => {
     if (editingEmployee) {
@@ -614,7 +615,6 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
 
       {/* Preview Modal */}
       {isPreviewModalOpen && editingEmployee && (() => {
-        const [employeeSearchTerm, setEmployeeSearchTerm] = React.useState('');
         const filteredEmpsForDropdown = employees.filter(e =>
           e.name.toLowerCase().includes(employeeSearchTerm.toLowerCase()) ||
           (e.employeeNumber && e.employeeNumber.toLowerCase().includes(employeeSearchTerm.toLowerCase()))
