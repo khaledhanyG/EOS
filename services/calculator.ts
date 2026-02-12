@@ -84,41 +84,9 @@ export const calculateServiceBreakdown = (hireDate: string, endDate: Date = new 
         months = 0;
         years += 1;
       }
-    } else {
-      // 4. Normal case (end is NOT month-end): Calculate actual calendar days
-      // Get the date at the same day in the end month
-      const baseDate = new Date(y2, m2, d1);
-      
-      // If baseDate is after end (e.g., start is 31st but end month has 30 days)
-      // then we need to adjust
-      if (baseDate > end) {
-        // Go back one month
-        months -= 1;
-        if (months < 0) {
-          months = 11;
-          years -= 1;
-        }
-        
-        // Calculate actual days from start day in the previous month to end date
-        const prevMonthBase = new Date(y2, m2 - 1, d1);
-        const diffMs = end.getTime() - prevMonthBase.getTime();
-        days = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1; // +1 to include end day
-      } else {
-        // Calculate actual days from baseDate to end
-        const diffMs = end.getTime() - baseDate.getTime();
-        days = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1; // +1 to include end day
-      }
-
-      // Rollover if needed
-      if (days >= 30) {
-        days = 0;
-        months += 1;
-      }
-      if (months >= 12) {
-        months = 0;
-        years += 1;
-      }
     }
+    // For non-month-end dates, the initial Y/M/D calculation already gives
+    // the correct breakdown (with 30-day borrowing which approximates actual days)
   }
 
   return { years, months, days };
