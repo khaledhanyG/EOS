@@ -47,7 +47,18 @@ export const calculateServiceBreakdown = (hireDate: string, endDate: Date = new 
   // 1. Calculate raw difference using Y/M/D subtraction with borrowing
   let years = y2 - y1;
   let months = m2 - m1;
-  let days = d2 - d1;
+  let days: number;
+
+  // Check if end date is the last day of the month
+  const isEndMonthEnd = isLastDayOfMonth(end);
+
+  if (isEndMonthEnd) {
+    // If end date is end of month: use 32 - start date
+    days = 32 - d1;
+  } else {
+    // If end date is not end of month: use end date - start date
+    days = d2 - d1;
+  }
 
   if (days < 0) {
     days += 30;
@@ -66,27 +77,16 @@ export const calculateServiceBreakdown = (hireDate: string, endDate: Date = new 
   // 2. Check if it's a perfect whole year (no additional adjustments needed)
   const isPerfectWholeYear = years > 0 && months === 0 && days === 0;
 
-  if (!isPerfectWholeYear) {
-    const isEndMonthEnd = isLastDayOfMonth(end);
+  if (!isPerfectWholeYear && isEndMonthEnd && days >= 30) {
+    // Convert remaining days >= 30 to a month
+    days = 0;
+    months += 1;
 
-    if (isEndMonthEnd) {
-      // 3. Month-end rule: Replace days with 32 - startDay formula
-      days = 32 - d1;
-
-      // Convert remaining days >= 30 to a month
-      if (days >= 30) {
-        days = 0;
-        months += 1;
-      }
-
-      // Rollover months to years if needed
-      if (months >= 12) {
-        months = 0;
-        years += 1;
-      }
+    // Rollover months to years if needed
+    if (months >= 12) {
+      months = 0;
+      years += 1;
     }
-    // For non-month-end dates, the initial Y/M/D calculation already gives
-    // the correct breakdown (with 30-day borrowing which approximates actual days)
   }
 
   return { years, months, days };
