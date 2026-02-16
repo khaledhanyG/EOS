@@ -127,8 +127,9 @@ export const calculateESBFromValues = (
 };
 
 export const calculateESB = (employee: Employee, targetDate: Date = new Date()): ESBCalculation & { breakdown: ServiceBreakdown } => {
-  const effectiveEndDate = employee.status === EmployeeStatus.TERMINATED && employee.terminationDate
-    ? new Date(employee.terminationDate)
+  const terminationDate = employee.terminationDate ? new Date(employee.terminationDate) : null;
+  const effectiveEndDate = employee.status === EmployeeStatus.TERMINATED && terminationDate
+    ? (targetDate < terminationDate ? targetDate : terminationDate)
     : targetDate;
 
   const totalMonthlySalary = getSalaryAtDate(employee, effectiveEndDate);
@@ -142,7 +143,10 @@ export const calculateESB = (employee: Employee, targetDate: Date = new Date()):
     employee.terminationReason
   );
 
-  const monthlyProvision = employee.status === EmployeeStatus.ACTIVE
+  const isActiveForDate = employee.status === EmployeeStatus.ACTIVE ||
+    (employee.status === EmployeeStatus.TERMINATED && terminationDate && targetDate < terminationDate);
+
+  const monthlyProvision = isActiveForDate
     ? (totalServiceYears < 5 ? totalMonthlySalary / 24 : totalMonthlySalary / 12)
     : 0;
 
