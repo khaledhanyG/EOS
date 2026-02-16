@@ -1,25 +1,29 @@
 
 import React, { useState, useEffect } from 'react';
-import { Employee, EmployeeStatus, SalaryHistoryEntry, TerminationReason, ServiceBreakdown } from '../types';
+import { Employee, EmployeeStatus, SalaryHistoryEntry, TerminationReason, ServiceBreakdown, Organization } from '../types';
 import { calculateESB, calculateServiceBreakdown, getSalaryAtDate } from '../services/calculator';
 import ExcelImportModal from './ExcelImportModal';
 
 interface EmployeeManagementProps {
   employees: Employee[];
+  organizations: Organization[];
+  currentOrgId: string;
   t: any;
   isRtl: boolean;
   addEmployee: (emp: any) => void;
   updateEmployee: (id: string, emp: any) => void;
   deleteEmployee: (id: string) => void;
+  transferEmployee: (emp: Employee, targetOrgId: string, transferDate: string) => void;
   canEdit: boolean;
 }
 
-const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, isRtl, addEmployee, updateEmployee, deleteEmployee, canEdit }) => {
+const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, organizations, currentOrgId, t, isRtl, addEmployee, updateEmployee, deleteEmployee, transferEmployee, canEdit }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSalaryModalOpen, setIsSalaryModalOpen] = useState(false);
   const [isTerminateModalOpen, setIsTerminateModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [isPayoutModalOpen, setIsPayoutModalOpen] = useState(false);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [editingHistoryIndex, setEditingHistoryIndex] = useState<number | null>(null);
@@ -34,6 +38,8 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
 
   const [previewCalcDate, setPreviewCalcDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [employeeSearchTerm, setEmployeeSearchTerm] = useState<string>('');
+  const [transferTargetOrgId, setTransferTargetOrgId] = useState<string>('');
+  const [transferDate, setTransferDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
     if (editingEmployee) {
@@ -156,6 +162,14 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
     setIsPayoutModalOpen(false);
   };
 
+  const handleTransferSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingEmployee || !canEdit) return;
+    if (!transferTargetOrgId) return;
+    transferEmployee(editingEmployee, transferTargetOrgId, transferDate);
+    setIsTransferModalOpen(false);
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!canEdit) return;
@@ -248,6 +262,7 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
                 const calc = calculateESB(emp);
                 const isTerminated = emp.status === EmployeeStatus.TERMINATED;
                 const isPaidFull = calc.remainingLiability <= 0 && isTerminated;
+                const otherOrgs = organizations.filter(org => org.id !== currentOrgId);
                 return (
                   <tr key={emp.id} className={`hover:bg-gray-50/50 transition-colors ${isTerminated ? 'bg-gray-50/50' : ''}`}>
                     <td className="px-6 py-5 font-mono text-gray-500 font-bold">{emp.employeeNumber}</td>
@@ -281,6 +296,19 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
                               <>
                                 <button onClick={() => { setEditingEmployee(emp); setIsSalaryModalOpen(true); }} className="p-2 hover:bg-white rounded-lg transition text-green-600 shadow-sm border border-transparent hover:border-gray-100">📈</button>
                                 <button onClick={() => { setEditingEmployee(emp); setIsTerminateModalOpen(true); }} className="p-2 hover:bg-white rounded-lg transition text-red-600 shadow-sm border border-transparent hover:border-gray-100">🚪</button>
+                                <button
+                                  onClick={() => {
+                                    setEditingEmployee(emp);
+                                    setTransferDate(new Date().toISOString().split('T')[0]);
+                                    setTransferTargetOrgId(otherOrgs[0]?.id || '');
+                                    setIsTransferModalOpen(true);
+                                  }}
+                                  disabled={otherOrgs.length === 0}
+                                  className="p-2 hover:bg-white rounded-lg transition text-amber-600 shadow-sm border border-transparent hover:border-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  title={otherOrgs.length === 0 ? t.noTransferOrgs : t.transferEmployee}
+                                >
+                                  🔁
+                                </button>
                               </>
                             ) : (
                               <button onClick={() => { setEditingEmployee(emp); setIsPayoutModalOpen(true); }} className="p-2 hover:bg-white rounded-lg transition text-blue-600 shadow-sm border border-transparent hover:border-gray-100">💰</button>
@@ -567,6 +595,49 @@ const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ employees, t, i
             <div className="flex justify-end pt-6 mt-6 border-t">
               <button type="button" onClick={() => setIsSalaryModalOpen(false)} className="px-6 py-2 font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition">{t.close}</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Transfer Employee Modal */}
+      {isTransferModalOpen && editingEmployee && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden">
+            <div className="p-6 bg-amber-50 border-b flex justify-between items-center">
+              <h2 className="text-lg font-black text-gray-800 tracking-tight">{t.transferEmployee}</h2>
+              <button onClick={() => setIsTransferModalOpen(false)} className="text-gray-400 hover:scale-110 transition font-bold">✕</button>
+            </div>
+            <form onSubmit={handleTransferSubmit} className="p-6 space-y-6">
+              <div>
+                <label className="block text-xs font-black text-gray-400 uppercase mb-1">{t.transferToOrg}</label>
+                <select
+                  required
+                  value={transferTargetOrgId}
+                  onChange={(e) => setTransferTargetOrgId(e.target.value)}
+                  className="w-full px-4 py-3 border rounded-xl font-bold focus:border-amber-500 outline-none"
+                >
+                  {organizations
+                    .filter(org => org.id !== currentOrgId)
+                    .map(org => (
+                      <option key={org.id} value={org.id}>{org.name}</option>
+                    ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-black text-gray-400 uppercase mb-1">{t.transferDate}</label>
+                <input
+                  type="date"
+                  required
+                  value={transferDate}
+                  onChange={(e) => setTransferDate(e.target.value)}
+                  className="w-full px-4 py-3 border rounded-xl font-bold focus:border-amber-500 outline-none"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={() => setIsTransferModalOpen(false)} className="px-6 py-2 font-bold text-gray-500">{t.cancel}</button>
+                <button type="submit" className="px-8 py-2 bg-amber-600 text-white font-black rounded-xl hover:bg-amber-700 transition shadow-lg shadow-amber-100">{t.confirmTransfer}</button>
+              </div>
+            </form>
           </div>
         </div>
       )}

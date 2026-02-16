@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { translations } from './translations';
-import { Employee, Language, User, Organization } from './types';
+import { Employee, Language, User, Organization, EmployeeStatus, TerminationReason } from './types';
 import Dashboard from './components/Dashboard';
 import EmployeeManagement from './components/EmployeeManagement';
 import Reports from './components/Reports';
@@ -10,7 +10,7 @@ import Login from './components/Login';
 import OrgSelection from './components/OrgSelection';
 import AdminSettings from './components/AdminSettings';
 import Services from './components/Services';
-import { initDatabase, fetchEmployees, dbAddEmployee, dbUpdateEmployee, dbDeleteEmployee } from './services/db';
+import { initDatabase, fetchEmployees, dbAddEmployee, dbUpdateEmployee, dbDeleteEmployee, fetchUserOrganizations } from './services/db';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -19,6 +19,7 @@ const App: React.FC = () => {
   const [language, setLanguage] = useState<Language>('ar');
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [userOrganizations, setUserOrganizations] = useState<Organization[]>([]);
 
   useEffect(() => {
     const startApp = async () => {
@@ -48,6 +49,15 @@ const App: React.FC = () => {
       loadEmployees();
     }
   }, [user, selectedOrg]);
+
+  useEffect(() => {
+    const loadUserOrgs = async () => {
+      if (!user) return;
+      const orgs = await fetchUserOrganizations(user.id);
+      setUserOrganizations(orgs);
+    };
+    loadUserOrgs();
+  }, [user]);
 
   const loadEmployees = async () => {
     if (!selectedOrg) return;
@@ -153,6 +163,41 @@ const App: React.FC = () => {
     }
   };
 
+  const transferEmployee = async (emp: Employee, targetOrgId: string, transferDate: string) => {
+    if (!user?.permissions.canEdit || !selectedOrg) return;
+    if (!targetOrgId || targetOrgId === selectedOrg.id) return;
+    const originalEmployees = [...employees];
+
+    const terminationUpdate: Partial<Employee> = {
+      status: EmployeeStatus.TERMINATED,
+      terminationDate: transferDate,
+      terminationReason: TerminationReason.MUTUAL_AGREEMENT,
+      contractEndDate: transferDate
+    };
+
+    const newEmployee: Employee = {
+      ...emp,
+      id: crypto.randomUUID(),
+      organizationId: targetOrgId,
+      status: EmployeeStatus.ACTIVE,
+      terminationDate: undefined,
+      terminationReason: undefined,
+      payoutAmount: 0,
+      payoutDate: undefined
+    };
+
+    try {
+      setEmployees(prev => prev.map(e => e.id === emp.id ? { ...e, ...terminationUpdate } : e));
+      await dbUpdateEmployee(emp.id, terminationUpdate);
+      await dbAddEmployee(newEmployee);
+      await loadEmployees();
+    } catch (err) {
+      console.error("Transfer employee error:", err);
+      setEmployees(originalEmployees);
+      alert(isRtl ? 'حدث خطأ أثناء نقل الموظف' : 'Failed to transfer employee');
+    }
+  };
+
   return (
     <div className={`flex flex-col min-h-screen bg-gray-50 ${isRtl ? 'rtl text-right' : 'ltr text-left'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <Sidebar
@@ -194,22 +239,28 @@ const App: React.FC = () => {
           {activeTab === 'employees' && user?.permissions.viewEmployees && (
             <EmployeeManagement
               employees={employees.filter(e => e.status === 'ACTIVE')}
+              organizations={userOrganizations}
+              currentOrgId={selectedOrg.id}
               t={t}
               isRtl={isRtl}
               addEmployee={addEmployee}
               updateEmployee={updateEmployee}
               deleteEmployee={deleteEmployee}
+              transferEmployee={transferEmployee}
               canEdit={user.permissions.canEdit}
             />
           )}
           {activeTab === 'archive' && user?.permissions.viewEmployees && (
             <EmployeeManagement
               employees={employees.filter(e => e.status !== 'ACTIVE')}
+              organizations={userOrganizations}
+              currentOrgId={selectedOrg.id}
               t={t}
               isRtl={isRtl}
               addEmployee={addEmployee}
               updateEmployee={updateEmployee}
               deleteEmployee={deleteEmployee}
+              transferEmployee={transferEmployee}
               canEdit={user.permissions.canEdit}
             />
           )}

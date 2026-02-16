@@ -98,7 +98,7 @@ const Dashboard: React.FC<DashboardProps> = ({ employees, t, isRtl }) => {
           }
           const esbEnd = calculateESB(emp, endDate);
           const esbStart = calculateESB(emp, startDate);
-          const diff = Math.max(0, esbEnd.remainingLiability - esbStart.remainingLiability);
+          const diff = Math.max(0, esbEnd.totalLiability - esbStart.totalLiability);
           annualTotal += diff;
           return diff;
         });
@@ -106,7 +106,7 @@ const Dashboard: React.FC<DashboardProps> = ({ employees, t, isRtl }) => {
         const yearEndDate = new Date(selectedYear, 11, 31);
         // If selected year is changing, we want the hypothetical liability at that date.
         // passing yearEndDate to calculateESB (which supports overrides)
-        const liabilityAtYearEnd = calculateESB(emp, yearEndDate).remainingLiability;
+        const liabilityAtYearEnd = calculateESB(emp, yearEndDate).totalLiability;
 
         return {
           id: emp.id,
@@ -116,7 +116,7 @@ const Dashboard: React.FC<DashboardProps> = ({ employees, t, isRtl }) => {
           liabilityAtYearEnd
         };
       })
-      .filter(row => row.annualTotal !== 0 || row.liabilityAtYearEnd !== 0);
+      .filter(row => row.monthlyValues.some(val => val !== 0));
   }, [employees, selectedYear, months, employeeSearchTerm]);
 
   return (
